@@ -1,45 +1,32 @@
-from flask import Flask, render_template, request, redirect, url_for,
+from flask import Flask, render_template, request
 from pymongo import MongoClient
 from pymongo.server_api import ServerApi
 
-app= flask(__name__)
-
-@app.route('/todo')
-def todo():
-    return render_template('todo.html')
-
-
-
-
-if __name__ == '__main__':
-    app.run(debug=True)
-
-from pymongo import MongoClient
-from pymongo.server_api import ServerApi
+app = Flask(__name__)
 
 # MongoDB Atlas Connection String
-
 MONGO_URI = "mongodb+srv://ermanoj250:ermanoj250@parul.xpxgml1.mongodb.net/?appName=parul"
 
-# Create a new client and connect to the server
+# Create MongoDB client
 client = MongoClient(MONGO_URI, server_api=ServerApi('1'))
 
-# Send a ping to confirm a successful connection
+# Test connection
 try:
     client.admin.command('ping')
     print("Pinged your deployment. You successfully connected to MongoDB!")
 except Exception as e:
     print(e)
 
-app = Flask(__name__)
-
-
-client = MongoClient(MONGO_URI)
-
 # Database and Collection
 db = client["flaskdb"]
 collection = db["users"]
 
+# Frontend To-Do Page
+@app.route('/todo')
+def todo():
+    return render_template('todo.html')
+
+# Backend API Route
 @app.route('/submittodoitem', methods=['POST'])
 def submit_todo():
 
@@ -54,3 +41,6 @@ def submit_todo():
     collection.insert_one(todo_data)
 
     return "To-Do Item Saved Successfully"
+
+if __name__ == '__main__':
+    app.run(debug=True)
